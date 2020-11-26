@@ -1,2 +1,6 @@
 server:
   port: 8080
+
+weather-api:
+  port: 34000
+  uri: localhost
