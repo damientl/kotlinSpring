@@ -4,9 +4,11 @@ import com.example.weather.api.CurrentWeatherDto
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.fasterxml.jackson.module.kotlin.readValue
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.getForEntity
 
 @Service
 class WeatherApiClient(val restTemplate: RestTemplate, val objectMapper: ObjectMapper) {
@@ -20,21 +22,20 @@ class WeatherApiClient(val restTemplate: RestTemplate, val objectMapper: ObjectM
 
     fun getCurrentWeather(): CurrentWeatherDto {
 
-        val response = restTemplate.getForEntity(
-                weatherApiUri + ":" + weatherApiPort + "/data/2.5/weather?" + "q=London&appid=123",
-                String::class.java)
+        val response = restTemplate.getForEntity<String>(
+                weatherApiUri + ":" + weatherApiPort + "/data/2.5/weather?" + "q=London&appid=123")
 
         return transform(mapBody(response.body))
     }
 
-    private fun mapBody(body: String?): WeatherApiResponse? {
-        return objectMapper.readValue(body, WeatherApiResponse::class.java)
-    }
-
-    private fun transform(body: WeatherApiResponse?): CurrentWeatherDto {
+    private fun mapBody(body: String?): WeatherApiResponse {
         if (body == null) {
             throw RuntimeException("Weather api null response")
         }
+        return objectMapper.readValue(body)
+    }
+
+    private fun transform(body: WeatherApiResponse): CurrentWeatherDto {
         // TODO array
         return CurrentWeatherDto(body.main.temp, body.main.pressure, transformWeather(body.weather[0].main))
     }

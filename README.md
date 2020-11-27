@@ -5,6 +5,8 @@ Demo microservice using kotlin 1.4.x, Gradle and Spring Boot 2.4.0.
 Information from code challenge is omitted.
 
 ## Get the service up and running
+Requirements:
+* Docker Desktop/daemon running on machine (for integration tests - testcontainers)
 In the root folder execute:
 ./gradlew bootRun
 
@@ -27,6 +29,7 @@ define the resources our application needs.
 
 The following architecture is proposed:
 * Upload our deployment package to Amazon S3 (see https://docs.aws.amazon.com/lambda/latest/dg/java-package.html)
+* Create a Mongo DB on AWS (needed because state can't be persisted on AWS Lambda)
 * Create an AWS Lambda function using AWS Serverless Java container: https://github.com/awslabs/aws-serverless-java-container
  and our existing Spring Boot Application 
 * Create an Api Gateway to receive the requests from the internet and transform into events

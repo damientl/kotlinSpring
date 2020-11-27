@@ -4,3 +4,8 @@ server:
 weather-api:
   port: 34000
   uri: localhost
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:8989/test
