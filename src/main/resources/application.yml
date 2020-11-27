@@ -1,6 +1,3 @@
-server:
-  port: 8080
-
 weather-api:
   port: 34000
   uri: localhost
@@ -8,4 +5,5 @@ weather-api:
 spring:
   data:
     mongodb:
+      # TODO set url from mongo DB container
       uri: mongodb://localhost:8989/test

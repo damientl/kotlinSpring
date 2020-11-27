@@ -2,8 +2,6 @@ package com.example.weather.client
 
 import com.example.weather.api.CurrentWeatherDto
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.json.JsonMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -20,7 +18,7 @@ class WeatherApiClient(val restTemplate: RestTemplate, val objectMapper: ObjectM
     lateinit var weatherApiUri: String
 
 
-    fun getCurrentWeather(): CurrentWeatherDto {
+    fun getCurrentWeather(city: String): CurrentWeatherDto {
 
         val response = restTemplate.getForEntity<String>(
                 weatherApiUri + ":" + weatherApiPort + "/data/2.5/weather?" + "q=London&appid=123")
