@@ -4,11 +4,17 @@ import com.example.weather.api.CurrentWeatherDto
 import com.example.weather.client.WeatherApiClient
 import com.example.weather.entity.Weather
 import com.example.weather.repository.WeatherRepository
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
-import kotlin.random.Random
 
 @Service
-class WeatherService (private val weatherApiClient: WeatherApiClient, private val repository: WeatherRepository){
+class WeatherService (private val weatherApiClient: WeatherApiClient,
+                      private val repository: WeatherRepository
+){
+
+    @Value("\${db.clear.probability.percentage}")
+    lateinit var clearProbabilityPercentage: Number
 
     fun getCurrentWeather(city: String): CurrentWeatherDto {
         val currentWeather = weatherApiClient.getCurrentWeather(city)
@@ -29,25 +35,24 @@ class WeatherService (private val weatherApiClient: WeatherApiClient, private va
     }
 
     private fun clearWeatherHistoryOccasionally(city: String) {
-        if(Random.nextInt(0, 100 - OCCASIONAL_PROBABILITY_PERCENTAGE) == 0){
-            val records = findLastRecordsForCity(city)
-            clearOldRecords(city, records)
+        if(DBHelper.toggleOccasionally(clearProbabilityPercentage.toInt())){
+            clearOldRecords(city, findNewestRecordsForCity(city))
         }
     }
 
-    private fun clearOldRecords(city: String, newestRecords: Array<Weather>) {
-        val oldRecords = repository.findByCityAndIdNotInAndOldTimestamp(city, newestRecords.map { it.id }.toTypedArray(),
+    private fun clearOldRecords(city: String, newestRecords: List<Weather>) {
+        val oldRecords = repository.findByCityAndOldTimestamp(city,
                 System.currentTimeMillis() - OLD_MILIS)
+                .filter { !newestRecords.contains(it) }
         repository.deleteAll(oldRecords.toMutableList())
     }
 
-    private fun findLastRecordsForCity(city: String): Array<Weather> {
-        return repository.findByCityOrderByTimestampDescLimitedTo(city, CITY_MAX_RECORDS)
+    private fun findNewestRecordsForCity(city: String): List<Weather> {
+        return repository.findByCityOrderByTimestampDesc(city, PageRequest.of(0,CITY_MAX_RECORDS))
     }
 
     companion object {
         private const val CITY_MAX_RECORDS: Int = 5
         private const val OLD_MILIS: Int = 2000
-        private const val OCCASIONAL_PROBABILITY_PERCENTAGE = 1
     }
 }

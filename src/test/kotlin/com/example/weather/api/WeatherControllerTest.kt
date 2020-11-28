@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.boot.test.web.client.getForEntity
 import org.springframework.http.*
 import org.springframework.test.context.ContextConfiguration
 
@@ -40,19 +41,15 @@ class WeatherControllerTest(@Autowired val restTemplate: TestRestTemplate,
     }
 
     @Test
-    fun shouldReturnCurrentWeather() {
+    fun shouldReturnCurrentWeatherAndSaveRecord() {
         // given
         mockWebServer!!.enqueue(MockResponse().setResponseCode(HttpStatus.OK.value())
                 .setHeader("Content-Type", "application/json")
                 .setBody(WeatherApiResponseFixtures.CURRENT_WEATHER)
         )
 
-        repository.findAll()
-
         // when
-        val response = restTemplate.getForEntity("/current?location=Berlin",
-                String::class.java);
-
+        val response = restTemplate.getForEntity<String>("/current?location=Berlin");
 
         // then
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
@@ -63,5 +60,11 @@ class WeatherControllerTest(@Autowired val restTemplate: TestRestTemplate,
         assertThat(body.pressure).isEqualTo("1012")
         assertThat(body.umbrella).isEqualTo(true)
 
+        val records = repository.findAll()
+        assertThat(records.size).isEqualTo(1)
+        val record = records[0]
+        assertThat(record).isNotNull
+        assertThat(record.city).isEqualTo("Berlin")
+        assertThat(record.temp).isEqualTo("280.32")
     }
 }

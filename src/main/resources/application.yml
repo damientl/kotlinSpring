@@ -7,3 +7,8 @@ spring:
     mongodb:
       # TODO set url from mongo DB container
       uri: mongodb://localhost:8989/test
+
+db:
+  clear:
+    probability:
+      percentage: 10

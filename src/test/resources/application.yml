@@ -1,3 +1,8 @@
 weather-api:
   port: 34000
   uri: http://localhost
+
+db:
+  clear:
+    probability:
+      percentage: 99
