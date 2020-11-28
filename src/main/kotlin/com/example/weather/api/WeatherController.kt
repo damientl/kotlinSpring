@@ -17,16 +17,10 @@ class WeatherController(private val weatherService: WeatherService) {
 
         //TODO currently not considering country.
         // Cities with same name on different countries will be considered equal.
-        val city = extractCityName(location)
+        val city = ParamsHelper.extractCityName(location)
 
 
-        return weatherService.getCurrentWeather(city.value)
-    }
-
-    private fun extractCityName(location: String) : MatchResult {
-        return Regex("([^,]+),[^,]*").find(location)
-                ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Name of the city does not conform to pattern: e.g. Berlin or Berlin,de")
+        return weatherService.getCurrentWeather(city)
     }
 
     private fun validateLocationFormat(location: String) {

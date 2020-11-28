@@ -15,11 +15,12 @@ class WeatherServiceTest {
     @Test
     fun getCurrentWeatherShouldReturnApiData() {
         // given
+        val city = "a"
         val expectedResult = CurrentWeatherDto("1", "1", true)
         every { client.getCurrentWeather(city) } returns expectedResult
 
         // when
-        val result = WeatherService(client, repository).getCurrentWeather(city.value)
+        val result = WeatherService(client, repository).getCurrentWeather(city)
 
         //then
         assertThat(result.temp).isEqualTo(expectedResult.temp)
