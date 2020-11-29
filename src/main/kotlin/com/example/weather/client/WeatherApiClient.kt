@@ -54,10 +54,10 @@ class WeatherApiClient(val restTemplate: RestTemplate, val objectMapper: ObjectM
             throw RuntimeException("Weather API did not return weather information. weather array is empty")
         }
 
-        return weather.map { transformWeatherIn(it.main) }.filter { it }.isNotEmpty()
+        return weather.map { transformWeather(it.main) }.filter { it }.isNotEmpty()
     }
 
-    private fun transformWeatherIn(main: String): Boolean {
+    private fun transformWeather(main: String): Boolean {
         return when (main) {
             "Thunderstorm", "Drizzle", "Rain" -> true
             else -> false
