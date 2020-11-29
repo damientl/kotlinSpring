@@ -6,17 +6,25 @@ class DBHelperTest {
 
     @Test
     fun shouldToogleOccasionallyRare() {
-        for (i in 1..55) {
+        var total = 0
+        for (i in 1..100) {
             val toggle = DBHelper.toggleOccasionally(1)
-            println(toggle)
+            if(toggle){
+                total++
+            }
         }
+        println("Total rare: $total")
     }
 
     @Test
     fun shouldToogleOccasionallyOften() {
-        for (i in 1..55) {
+        var total = 0
+        for (i in 1..100) {
             val toggle = DBHelper.toggleOccasionally(99)
-            println(toggle)
+            if(toggle){
+                total++
+            }
         }
+        println("Total often: $total")
     }
 }

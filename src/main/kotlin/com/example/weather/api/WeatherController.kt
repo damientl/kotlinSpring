@@ -23,6 +23,12 @@ class WeatherController(private val weatherService: WeatherService) {
         return weatherService.getCurrentWeather(city)
     }
 
+    @GetMapping(path = ["/history"], consumes = [MediaType.ALL_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getHistory(@RequestParam location: String) : WeatherHistoryDto {
+        val city = ParamsHelper.extractCityName(location)
+        return weatherService.getWeatherHistory(city)
+    }
+
     private fun validateLocationFormat(location: String) {
         if(location.isBlank()) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Name of the city is blank")

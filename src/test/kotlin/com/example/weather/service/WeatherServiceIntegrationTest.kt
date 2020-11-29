@@ -1,13 +1,9 @@
 package com.example.weather.service
 
-import com.example.weather.api.CurrentWeatherDto
 import com.example.weather.api.WeatherApiResponseFixtures
 import com.example.weather.client.WeatherApiClient
 import com.example.weather.context.MongoDBInitializer
-import com.example.weather.entity.Weather
 import com.example.weather.repository.WeatherRepository
-import io.mockk.every
-import io.mockk.mockk
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.assertj.core.api.Assertions
@@ -21,10 +17,10 @@ import org.springframework.test.context.ContextConfiguration
 
 @SpringBootTest
 @ContextConfiguration(initializers = [MongoDBInitializer::class])
-class WeatherServiceIntegrationTest (
+class WeatherServiceIntegrationTest(
         @Autowired val repository: WeatherRepository,
         @Autowired val service: WeatherService,
-        @Autowired val client: WeatherApiClient){
+        @Autowired val client: WeatherApiClient) {
 
     private var mockWebServer: MockWebServer? = null
 
@@ -38,10 +34,12 @@ class WeatherServiceIntegrationTest (
     fun afterAll() {
         mockWebServer!!.shutdown()
         mockWebServer = null
+
+        repository.deleteAll()
     }
 
     @Test
-    fun shouldSave5Records(){
+    fun shouldSave5Records() {
         val city = "a"
 
         for (i in 1..5) {
@@ -50,7 +48,6 @@ class WeatherServiceIntegrationTest (
                     .setBody(WeatherApiResponseFixtures.CURRENT_WEATHER)
             )
             service.getCurrentWeather(city)
-            Thread.sleep(1000)
         }
 
         val records = repository.findAll()
@@ -59,4 +56,21 @@ class WeatherServiceIntegrationTest (
         Assertions.assertThat(record).isNotNull
     }
 
+    @Test
+    fun shouldSaveAtLeast5Records() {
+        val city = "a"
+
+        for (i in 1..10) {
+            mockWebServer!!.enqueue(MockResponse().setResponseCode(HttpStatus.OK.value())
+                    .setHeader("Content-Type", "application/json")
+                    .setBody(WeatherApiResponseFixtures.CURRENT_WEATHER)
+            )
+            service.getCurrentWeather(city)
+        }
+
+        val records = repository.findAll()
+        Assertions.assertThat(records.size).isGreaterThanOrEqualTo(5)
+        val record = records[0]
+        Assertions.assertThat(record).isNotNull
+    }
 }

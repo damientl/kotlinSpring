@@ -2,6 +2,7 @@ package com.example.weather.api
 
 import com.example.weather.client.WeatherApiClient
 import com.example.weather.context.MongoDBInitializer
+import com.example.weather.entity.Weather
 import com.example.weather.repository.WeatherRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -38,10 +39,12 @@ class WeatherControllerTest(@Autowired val restTemplate: TestRestTemplate,
     fun afterAll() {
         mockWebServer!!.shutdown()
         mockWebServer = null
+
+        repository.deleteAll()
     }
 
     @Test
-    fun shouldReturnCurrentWeatherAndSaveRecord() {
+    fun getCurrentWeatherShouldReturnCurrentWeatherAndSaveRecord() {
         // given
         mockWebServer!!.enqueue(MockResponse().setResponseCode(HttpStatus.OK.value())
                 .setHeader("Content-Type", "application/json")
@@ -66,5 +69,49 @@ class WeatherControllerTest(@Autowired val restTemplate: TestRestTemplate,
         assertThat(record).isNotNull
         assertThat(record.city).isEqualTo("Berlin")
         assertThat(record.temp).isEqualTo("280.32")
+    }
+
+
+    @Test
+    fun getCurrentWeatherShouldReturn500Error() {
+
+        // given
+        mockWebServer!!.enqueue(MockResponse().setResponseCode(HttpStatus.OK.value())
+                .setHeader("Content-Type", "application/json")
+                .setBody(WeatherApiResponseFixtures.CURRENT_WEATHER_INVALID_JSON)
+        )
+
+        // when
+        val response = restTemplate.getForEntity<String>("/current?location=Berlin");
+
+        // then
+        assertThat(response.statusCode).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR)
+        assertThat(response.body).isNotNull
+    }
+
+    @Test
+    fun getHistoryShouldReturnAvailableHistory(){
+
+        // given
+        for (i in 1..10) {
+            val record = Weather(temp = "12",
+                    city = "Berlin",
+                    pressure = "10",
+                    umbrella = true,
+                    timestamp = System.currentTimeMillis()
+            )
+            repository.save(record)
+        }
+
+        // when
+        val response = restTemplate.getForEntity<String>("/history?location=Berlin")
+
+        // then
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.body).isNotNull
+
+        val body = mapper.readValue<WeatherHistoryDto>(response.body!!)
+
+        assertThat(body.history).hasAtLeastOneElementOfType(WeatherHistoryDto.WeatherDto::class.java)
     }
 }
