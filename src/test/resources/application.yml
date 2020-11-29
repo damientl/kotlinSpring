@@ -1,6 +1,7 @@
 weather-api:
   port: 34000
   uri: http://localhost
+  appId: 123
 
 db:
   clear:

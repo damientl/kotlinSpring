@@ -20,13 +20,16 @@ class WeatherApiClient(val restTemplate: RestTemplate, val objectMapper: ObjectM
     @Value("\${weather-api.uri}")
     lateinit var weatherApiUri: String
 
+    @Value("\${weather-api.appId}")
+    lateinit var appId: String
+
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     fun getCurrentWeather(city: String): CurrentWeatherDto {
         try {
             log.debug("Request Weather API for city {}", city)
             val response = restTemplate.getForEntity<String>(
-                    weatherApiUri + ":" + weatherApiPort + "/data/2.5/weather?" + "q=London&appid=123")
+                    "$weatherApiUri:$weatherApiPort/data/2.5/weather?q=$city&appid=$appId")
             return transform(mapBody(response.body))
         } catch (e: MissingKotlinParameterException) {
             log.error("Weather API invalid response", e)

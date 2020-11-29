@@ -1,6 +1,7 @@
 weather-api:
-  port: 34000
-  uri: localhost
+  port: 80
+  uri: https://api.openweathermap.org
+  appId: 123
 
 spring:
   data:
