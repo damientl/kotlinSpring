@@ -24,11 +24,21 @@ Example request:
 GET http://localhost:8080/current?location=Berlin
 
 ## Production ready microservice
+A production ready microservice should include mechanisms to monitor the application, troubleshoot eventual
+bugs and be easily maintained with relatively low costs. Also, it should have a flexible design so that 
+it can evolve with business needs. 
+
+This microservice should have more integration tests and unit tests. Although current coverage 
+is 86% on lines of code, more corner cases should be tested.
+Error handling can be improved, and a few TODOs that were left on the code should be done.
+It may be necessary further configuration for application logs to integrate with Amazon Cloudwatch.
+The application performance should be measured using monitoring solutions and metrics.
 
 ## How to deploy the application in an AWS
 
 In order to deploy a simple application with low initial costs we can use AWS Lambda.
-After the business evolves more sophisticated solutions can be proposed, for example using Kubernetes.
+After the business evolves more sophisticated solutions can be proposed, for example using Kubernetes
+to deploy microservices.
 
 Terraform can be used to write infrastructure as a code on AWS and 
 define the resources our application needs.
