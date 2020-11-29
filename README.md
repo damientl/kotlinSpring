@@ -44,8 +44,9 @@ Terraform can be used to write infrastructure as a code on AWS and
 define the resources our application needs.
 
 The following architecture is proposed:
-* Create a Mongo DB on AWS (needed because state can't be persisted on AWS Lambda)
+* Create a MongoDB on AWS (needed because state can't be persisted on AWS Lambda)
 * Set spring.data.mongodb.uri and Weather Api properties
+* For the Weather API, API KEY should be configured
 * Build and Upload our deployment package to Amazon S3 (see https://docs.aws.amazon.com/lambda/latest/dg/java-package.html)
 * Create an AWS Lambda function using AWS Serverless Java container: https://github.com/awslabs/aws-serverless-java-container
  and our existing Spring Boot Application 
