@@ -2,7 +2,7 @@
 
 Demo microservice using kotlin 1.4.x, Gradle and Spring Boot 2.4.0.
 
-Information from code challenge is omitted.
+Information from code challenge specification is omitted.
 
 ## Get the service up and running
 Requirements:
